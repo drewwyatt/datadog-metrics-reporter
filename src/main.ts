@@ -8,8 +8,8 @@ const slugify = (s: string) =>
     .toString()
     .toLowerCase()
     .trim()
-    .replace(/&/g, '-and-')
-    .replace(/[\s\W-]+/g, '-')
+    .replace(/&/g, '_and_')
+    .replace(/[\s\W-]+/g, '_')
     .replace(/-$/, '')
 
 const toMetric = (...keys: string[]) => keys.map(slugify).join('.')
