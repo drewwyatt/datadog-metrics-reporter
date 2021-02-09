@@ -2,9 +2,12 @@ name: 'Your name here'
 description: 'Provide a description here'
 author: 'Your name or organization here'
 inputs:
+  datadog-api-key:
+    required: true
+    description: 'not an app key'
   github-token:
     required: true
-    description: 'probably {{secrets.GITHUB_TOKEN}}'
+    description: 'probably ${{secrets.GITHUB_TOKEN}}'
 runs:
   using: 'node12'
   main: 'dist/index.js'
