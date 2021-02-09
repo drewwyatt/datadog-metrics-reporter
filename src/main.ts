@@ -10,7 +10,7 @@ const slugify = (s: string) =>
     .trim()
     .replace(/&/g, '_and_')
     .replace(/[\s\W-]+/g, '_')
-    .replace(/-$/, '')
+    .replace(/_$/, '')
 
 const toMetric = (keys: string[]) => keys.filter(Boolean).map(slugify).join('.')
 

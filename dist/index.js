@@ -65,7 +65,7 @@ const slugify = (s) => s
     .trim()
     .replace(/&/g, '_and_')
     .replace(/[\s\W-]+/g, '_')
-    .replace(/-$/, '');
+    .replace(/_$/, '');
 const toMetric = (keys) => keys.filter(Boolean).map(slugify).join('.');
 const reportMetrics = (context, job, step) => {
     const subject = step !== null && step !== void 0 ? step : job;
