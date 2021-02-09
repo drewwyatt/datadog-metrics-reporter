@@ -80,14 +80,12 @@ const reportMetrics = (context, job, step) => {
         const namespace = [context.repo.repo, job.name, step === null || step === void 0 ? void 0 : step.name];
         core.info(`${toMetric(namespace)}: ${tags}]`);
         core.info(`${toMetric([...namespace, subject.conclusion])}: ${tags}`);
-        // TODO: get rid of this
+        datadog_metrics_1.default.gauge(toMetric(namespace), duration, tags);
+        datadog_metrics_1.default.gauge(toMetric([...namespace, subject.conclusion]), duration, tags);
         if (step) {
-            datadog_metrics_1.default.gauge(toMetric(namespace), duration, tags);
-            datadog_metrics_1.default.gauge(toMetric([...namespace, subject.conclusion]), duration, tags);
-        }
-        else {
-            datadog_metrics_1.default.histogram(toMetric(namespace), duration, tags);
-            datadog_metrics_1.default.histogram(toMetric([...namespace, subject.conclusion]), duration, tags);
+            const hNamespace = [context.repo.repo, job.name, 'steps'];
+            datadog_metrics_1.default.histogram(toMetric(hNamespace), duration, tags);
+            datadog_metrics_1.default.histogram(toMetric([...hNamespace, subject.conclusion]), duration, tags);
         }
     }
 };

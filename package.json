@@ -1,6 +1,6 @@
 {
   "name": "datadog-metrics-reporter",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "Report CI metrics to datadog",
   "main": "lib/main.js",

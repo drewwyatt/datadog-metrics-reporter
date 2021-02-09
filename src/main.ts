@@ -30,18 +30,14 @@ const reportMetrics = (context: any, job: any, step?: any) => {
     core.info(`${toMetric(namespace)}: ${tags}]`)
     core.info(`${toMetric([...namespace, subject.conclusion])}: ${tags}`)
 
-    // TODO: get rid of this
+    metrics.gauge(toMetric(namespace), duration, tags)
+    metrics.gauge(toMetric([...namespace, subject.conclusion]), duration, tags)
+
     if (step) {
-      metrics.gauge(toMetric(namespace), duration, tags)
-      metrics.gauge(
-        toMetric([...namespace, subject.conclusion]),
-        duration,
-        tags
-      )
-    } else {
-      metrics.histogram(toMetric(namespace), duration, tags)
+      const hNamespace = [context.repo.repo, job.name, 'steps']
+      metrics.histogram(toMetric(hNamespace), duration, tags)
       metrics.histogram(
-        toMetric([...namespace, subject.conclusion]),
+        toMetric([...hNamespace, subject.conclusion]),
         duration,
         tags
       )
