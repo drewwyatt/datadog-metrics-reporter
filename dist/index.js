@@ -49,7 +49,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.debug('Getting token');
-            const token = core.getInput('github-token...', { required: true });
+            const token = core.getInput('github-token', { required: true });
             core.debug('Getting octokit with token...');
             const octokit = github.getOctokit(token);
             const context = github.context;
