@@ -62,10 +62,12 @@ function run() {
             core.startGroup('metrics?');
             for (const job of currentRun.data.jobs) {
                 for (const step of job.steps) {
-                    const completedAt = new Date(step.completed_at);
-                    const startedAt = new Date(step.started_at);
-                    const duration = (completedAt - startedAt) / 1000;
-                    core.info(`${slugify(job.name)}.${slugify(step.name)}.${step.conclusion}: ${duration}s`);
+                    if (step.conclusion) {
+                        const completedAt = new Date(step.completed_at);
+                        const startedAt = new Date(step.started_at);
+                        const duration = (completedAt - startedAt) / 1000;
+                        core.info(`${slugify(job.name)}.${slugify(step.name)}.${step.conclusion}: ${duration}s`);
+                    }
                 }
             }
             core.endGroup();
