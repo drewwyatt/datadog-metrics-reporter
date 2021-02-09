@@ -1,8 +1,8 @@
 {
-  "name": "typescript-action",
+  "name": "datadog-metrics-reporter",
   "version": "0.0.0",
   "private": true,
-  "description": "TypeScript template action",
+  "description": "Report CI metrics to datadog",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -11,11 +11,11 @@
     "lint": "eslint src/**/*.ts",
     "package": "ncc build --source-map --license licenses.txt",
     "test": "jest",
-    "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
+    "all": "yarn -s build && yarn -s format && yarn -s lint && yarn -s package && yarn test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/drewwyatt/datadog-metrics-reporter.git"
   },
   "keywords": [
     "actions",
@@ -25,7 +25,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.2.6"
+    "@actions/core": "^1.2.6",
+    "@actions/github": "^4.0.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.15",
