@@ -13,7 +13,7 @@ const slugify = (s: string) =>
 async function run(): Promise<void> {
   try {
     core.debug('Getting token')
-    const token = core.getInput('github-token...', { required: true })
+    const token = core.getInput('github-token', { required: true })
     core.debug('Getting octokit with token...')
     const octokit = github.getOctokit(token)
 
