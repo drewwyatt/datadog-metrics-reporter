@@ -8,6 +8,10 @@ inputs:
   github-token:
     required: true
     description: 'probably secrets.GITHUB_TOKEN'
+branding:
+  icon: 'activity'
+  color: 'purple'
+
 runs:
   using: 'node12'
   main: 'dist/index.js'
