@@ -12,7 +12,42 @@ const slugify = (s: string) =>
     .replace(/[\s\W-]+/g, '_')
     .replace(/-$/, '')
 
-const toMetric = (...keys: string[]) => keys.map(slugify).join('.')
+const toMetric = (keys: string[]) => keys.filter(Boolean).map(slugify).join('.')
+
+const reportMetrics = (context: any, job: any, step?: any) => {
+  const subject = step ?? job
+  if (subject.conclusion) {
+    const tags = [
+      `event_name:${context.eventName}`,
+      `conclusion:${subject.conclusion}`
+    ]
+    const completedAt: any = new Date(subject.completed_at)
+    const startedAt: any = new Date(subject.started_at)
+    const duration = (completedAt - startedAt) / 1000
+
+    const namespace = [context.repo.repo, job.name, step?.name]
+
+    core.info(`${toMetric(namespace)}: ${tags}]`)
+    core.info(`${toMetric([...namespace, subject.conclusion])}: ${tags}`)
+
+    // TODO: get rid of this
+    if (step) {
+      metrics.gauge(toMetric(namespace), duration, tags)
+      metrics.gauge(
+        toMetric([...namespace, subject.conclusion]),
+        duration,
+        tags
+      )
+    } else {
+      metrics.histogram(toMetric(namespace), duration, tags)
+      metrics.histogram(
+        toMetric([...namespace, subject.conclusion]),
+        duration,
+        tags
+      )
+    }
+  }
+}
 
 async function run(): Promise<void> {
   try {
@@ -32,37 +67,10 @@ async function run(): Promise<void> {
 
     core.startGroup('metrics')
     for (const job of currentRun.data.jobs) {
-      if (job.conclusion) {
-        const completedAt: any = new Date(job.completed_at)
-        const startedAt: any = new Date(job.started_at)
-        const duration = (completedAt - startedAt) / 1000
-        const metric = toMetric(
-          context.repo.repo,
-          context.workflow,
-          job.name,
-          job.conclusion
-        )
-
-        core.info(`${metric}: ${duration} [${context.eventName}]`)
-        metrics.histogram(metric, duration, [context.eventName])
-      }
+      reportMetrics(context, job)
 
       for (const step of job.steps) {
-        if (step.conclusion) {
-          const completedAt: any = new Date(step.completed_at)
-          const startedAt: any = new Date(step.started_at)
-          const duration = (completedAt - startedAt) / 1000
-          const metric = toMetric(
-            context.repo.repo,
-            context.workflow,
-            job.name,
-            step.name,
-            step.conclusion
-          )
-
-          core.info(`${metric}: ${duration} [${context.eventName}]`)
-          metrics.gauge(metric, duration, [context.eventName])
-        }
+        reportMetrics(context, job, step)
       }
     }
 
