@@ -26,19 +26,20 @@ async function run(): Promise<void> {
       run_id: context.runId
     })
 
-    core.debug('looping jobs...')
+    core.startGroup('metrics?')
     for (const job of currentRun.data.jobs) {
       for (const step of job.steps) {
         const completedAt: any = new Date(step.completed_at)
         const startedAt: any = new Date(step.started_at)
         const duration = (completedAt - startedAt) / 1000
-        core.debug(
+        core.info(
           `${slugify(job.name)}.${slugify(step.name)}.${
             step.conclusion
           }: ${duration}s`
         )
       }
     }
+    core.endGroup()
   } catch (error) {
     core.setFailed(error.message)
   }

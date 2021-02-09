@@ -59,15 +59,16 @@ function run() {
                 repo: context.repo.repo,
                 run_id: context.runId
             });
-            core.debug('looping jobs...');
+            core.startGroup('metrics?');
             for (const job of currentRun.data.jobs) {
                 for (const step of job.steps) {
                     const completedAt = new Date(step.completed_at);
                     const startedAt = new Date(step.started_at);
                     const duration = (completedAt - startedAt) / 1000;
-                    core.debug(`${slugify(job.name)}.${slugify(step.name)}.${step.conclusion}: ${duration}s`);
+                    core.info(`${slugify(job.name)}.${slugify(step.name)}.${step.conclusion}: ${duration}s`);
                 }
             }
+            core.endGroup();
         }
         catch (error) {
             core.setFailed(error.message);
