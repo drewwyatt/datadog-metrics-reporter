@@ -32,6 +32,21 @@ async function run(): Promise<void> {
 
     core.startGroup('metrics')
     for (const job of currentRun.data.jobs) {
+      if (job.conclusion) {
+        const completedAt: any = new Date(job.completed_at)
+        const startedAt: any = new Date(job.started_at)
+        const duration = (completedAt - startedAt) / 1000
+        const metric = toMetric(
+          context.repo.repo,
+          context.workflow,
+          job.name,
+          job.conclusion
+        )
+
+        core.info(`${metric}: ${duration} [${context.eventName}]`)
+        metrics.histogram(metric, duration, [context.eventName])
+      }
+
       for (const step of job.steps) {
         if (step.conclusion) {
           const completedAt: any = new Date(step.completed_at)
@@ -50,6 +65,7 @@ async function run(): Promise<void> {
         }
       }
     }
+
     core.endGroup()
     core.debug('flushing...')
     await new Promise<void>(metrics.flush)
