@@ -7,7 +7,7 @@ inputs:
     description: 'not an app key'
   github-token:
     required: true
-    description: 'probably ${{secrets.GITHUB_TOKEN}}'
+    description: 'probably secrets.GITHUB_TOKEN'
 runs:
   using: 'node12'
   main: 'dist/index.js'
