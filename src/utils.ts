@@ -86,7 +86,7 @@ export const toMetricsReporter = (
     if (step) {
       handleMetric('histogram', {
         conclusion: subject.conclusion,
-        namespace: [context.repo.repo, job.name, 'steps'],
+        namespace: [context.repo.repo, job.name, step.name],
         duration,
         tags,
       })
