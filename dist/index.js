@@ -59,55 +59,28 @@ const core = __importStar(__webpack_require__(2186));
 const github = __importStar(__webpack_require__(5438));
 const datadog_metrics_1 = __importDefault(__webpack_require__(4299));
 const env_1 = __webpack_require__(9763);
-const slugify = (s) => s
-    .toString()
-    .toLowerCase()
-    .trim()
-    .replace(/&/g, '_and_')
-    .replace(/[\s\W-]+/g, '_')
-    .replace(/_$/, '');
-const toMetric = (keys) => keys.filter(Boolean).map(slugify).join('.');
-const reportMetrics = (context, job, step) => {
-    const subject = step !== null && step !== void 0 ? step : job;
-    if (subject.conclusion) {
-        const tags = [
-            `event_name:${context.eventName}`,
-            `conclusion:${subject.conclusion}`
-        ];
-        const completedAt = new Date(subject.completed_at);
-        const startedAt = new Date(subject.started_at);
-        const duration = (completedAt - startedAt) / 1000;
-        const namespace = [context.repo.repo, job.name, step === null || step === void 0 ? void 0 : step.name];
-        core.info(`${toMetric(namespace)}: ${tags}]`);
-        core.info(`${toMetric([...namespace, subject.conclusion])}: ${tags}`);
-        datadog_metrics_1.default.gauge(toMetric(namespace), duration, tags);
-        datadog_metrics_1.default.gauge(toMetric([...namespace, subject.conclusion]), duration, tags);
-        if (step) {
-            const hNamespace = [context.repo.repo, job.name, 'steps'];
-            datadog_metrics_1.default.histogram(toMetric(hNamespace), duration, tags);
-            datadog_metrics_1.default.histogram(toMetric([...hNamespace, subject.conclusion]), duration, tags);
-        }
-    }
-};
+const utils_1 = __webpack_require__(918);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            core.debug('Getting octokit with token...');
+            core.debug('getting octokit with token...');
             const context = github.context;
             const octokit = github.getOctokit(env_1.GITHUB_TOKEN);
-            core.debug('setting up datadog client');
+            core.debug('setting up datadog client...');
             datadog_metrics_1.default.init({ apiKey: env_1.DATADOG_API_KEY });
             core.debug('listing jobs for workflow run...');
             const currentRun = yield octokit.actions.listJobsForWorkflowRun({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                run_id: context.runId
+                run_id: context.runId,
             });
+            core.debug('creating metrics reporter...');
+            const report = utils_1.toMetricsReporter(core.info, datadog_metrics_1.default);
             core.startGroup('metrics');
             for (const job of currentRun.data.jobs) {
-                reportMetrics(context, job);
+                report(context, job);
                 for (const step of job.steps) {
-                    reportMetrics(context, job, step);
+                    report(context, job, step);
                 }
             }
             core.endGroup();
@@ -120,6 +93,63 @@ function run() {
     });
 }
 run();
+
+
+/***/ }),
+
+/***/ 918:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.toMetricsReporter = void 0;
+const slugify = (s) => s
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, '_and_')
+    .replace(/[\s\W-]+/g, '_')
+    .replace(/_$/, '');
+const notNil = Boolean;
+const toMetricKey = (keys) => keys.filter(notNil).map(slugify).join('.');
+const toDuration = (subject) => {
+    const completedAt = new Date(subject.completed_at);
+    const startedAt = new Date(subject.started_at);
+    return (completedAt - startedAt) / 1000;
+};
+const toTags = ({ eventName }, { conclusion }) => [`event_name:${eventName}`, `conclusion:${conclusion}`];
+const toMetricsHandler = (log, report) => (metricType, { conclusion, duration, namespace, tags, }) => {
+    const baseKey = toMetricKey(namespace);
+    const keyWithConclusion = toMetricKey([baseKey, conclusion]);
+    log(`(${metricType}) ${baseKey}: ${duration} [${tags}]`);
+    log(`(${metricType}) ${keyWithConclusion}: ${duration} [${tags}]`);
+    report[metricType](baseKey, duration, tags);
+    report[metricType](keyWithConclusion, duration, tags);
+};
+const toMetricsReporter = (logger, reporter) => (context, job, step) => {
+    const subject = step !== null && step !== void 0 ? step : job;
+    if (subject.conclusion) {
+        const handleMetric = toMetricsHandler(logger, reporter);
+        const tags = toTags(context, subject);
+        const duration = toDuration(subject);
+        handleMetric('gauge', {
+            conclusion: subject.conclusion,
+            namespace: [context.repo.repo, job.name, step === null || step === void 0 ? void 0 : step.name],
+            duration,
+            tags,
+        });
+        if (step) {
+            handleMetric('histogram', {
+                conclusion: subject.conclusion,
+                namespace: [context.repo.repo, job.name, 'steps'],
+                duration,
+                tags,
+            });
+        }
+    }
+};
+exports.toMetricsReporter = toMetricsReporter;
 
 
 /***/ }),
