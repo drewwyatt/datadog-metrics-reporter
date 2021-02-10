@@ -78,7 +78,7 @@ export const toMetricsReporter = (
 
     handleMetric('gauge', {
       conclusion: subject.conclusion,
-      namespace: [context.repo.repo, job.name, step?.name ?? 'steps'],
+      namespace: [context.repo.repo, job.name, step?.name],
       duration,
       tags,
     })
