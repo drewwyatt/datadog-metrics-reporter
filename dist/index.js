@@ -135,14 +135,14 @@ const toMetricsReporter = (logger, reporter) => (context, job, step) => {
         const duration = toDuration(subject);
         handleMetric('gauge', {
             conclusion: subject.conclusion,
-            namespace: [context.repo.repo, job.name, step === null || step === void 0 ? void 0 : step.name],
+            namespace: [context.repo.repo, context.workflow, job.name, step === null || step === void 0 ? void 0 : step.name],
             duration,
             tags,
         });
         if (step) {
             handleMetric('histogram', {
                 conclusion: subject.conclusion,
-                namespace: [context.repo.repo, job.name, 'steps'],
+                namespace: [context.repo.repo, context.workflow, job.name, 'steps'],
                 duration,
                 tags,
             });

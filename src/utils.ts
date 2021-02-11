@@ -10,9 +10,9 @@ type WorkflowRun = UnwrapPromise<
   ReturnType<Octokit['actions']['listJobsForWorkflowRun']>
 >
 
-type Context = typeof github.context
-type Job = WorkflowRun['data']['jobs'][number]
-type Step = Job['steps'][number]
+export type Context = typeof github.context
+export type Job = WorkflowRun['data']['jobs'][number]
+export type Step = Job['steps'][number]
 type Subject = Job | Step
 type Reporter = typeof metrics
 
@@ -78,7 +78,7 @@ export const toMetricsReporter = (
 
     handleMetric('gauge', {
       conclusion: subject.conclusion,
-      namespace: [context.repo.repo, job.name, step?.name],
+      namespace: [context.repo.repo, context.workflow, job.name, step?.name],
       duration,
       tags,
     })
@@ -86,7 +86,7 @@ export const toMetricsReporter = (
     if (step) {
       handleMetric('histogram', {
         conclusion: subject.conclusion,
-        namespace: [context.repo.repo, job.name, 'steps'],
+        namespace: [context.repo.repo, context.workflow, job.name, 'steps'],
         duration,
         tags,
       })
