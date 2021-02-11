@@ -19,10 +19,10 @@
   },
   "keywords": [
     "actions",
-    "node",
-    "setup"
+    "datadog",
+    "metrics"
   ],
-  "author": "",
+  "author": "Drew Wyatt <drew.j.wyatt@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.6",
