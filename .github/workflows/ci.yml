@@ -1,4 +1,4 @@
-name: 'build-test'
+name: 'CI'
 on:
   pull_request:
   push:
@@ -10,15 +10,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: |
-          yarn
-      - run: |
-          yarn all
+      - run: yarn
+      - run: yarn build
+      - run: yarn package
       - name: 'Fail if there is a dirty working copy (i.e. we forgot to check in artifacts)'
-        run: |
-          git diff --exit-code
-
+        run: git diff --exit-code
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: yarn
+      - run: yarn lint
+      - run: yarn format
   test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: yarn
+      - run: yarn test
+  e2e:
     runs-on: ubuntu-latest
     needs: [build]
     if: always()
