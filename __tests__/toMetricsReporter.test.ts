@@ -29,16 +29,20 @@ describe('toMetricsReporter', () => {
   })
 
   describe('for jobs', () => {
+    beforeEach(() => subject(context, job))
+
     it('reports gauge metrics with the conclusion', () => {
-      subject(context, job)
       const [metricsKey] = getMetricsParams(metrics.gauge, 0)
       expect(metricsKey).not.toContain(job.conclusion)
     })
 
     it('reports gauge metrics without the conclusion', () => {
-      subject(context, job)
       const [metricsKey] = getMetricsParams(metrics.gauge, 1)
       expect(metricsKey).toContain(job.conclusion)
+    })
+
+    it('does not report histograms', () => {
+      expect(metrics.histogram).not.toHaveBeenCalled()
     })
   })
 })
