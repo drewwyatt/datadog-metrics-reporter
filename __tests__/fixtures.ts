@@ -1,5 +1,5 @@
 import faker from 'faker'
-import type { Context, Job } from '../src/utils'
+import type { Context, Job, Step } from '../src/utils'
 
 const toEventName = () =>
   faker.random.arrayElement(['pull_request', 'push', 'schedule'] as const)
@@ -47,7 +47,10 @@ export const toContextFixture = (overrides: Partial<Context> = {}): Context => {
   }
 }
 
-export const toJobFixture = (overrides: Partial<Job> = {}): Job => ({
+export const toJobFixture = (
+  numberOfSteps: number = 3,
+  overrides: Partial<Job> = {},
+): Job => ({
   conclusion: toConclusion(),
   id: toId(),
   check_run_url: faker.internet.url(),
@@ -56,7 +59,9 @@ export const toJobFixture = (overrides: Partial<Job> = {}): Job => ({
   run_url: faker.internet.url(),
   node_id: faker.internet.userName(),
   head_sha: faker.git.commitSha(),
-  steps: [],
+  steps: Array(numberOfSteps)
+    .fill(null)
+    .map(() => toStepFixture()),
   name: toName(),
   url: faker.internet.url(),
   html_url: faker.internet.url(),
@@ -65,4 +70,14 @@ export const toJobFixture = (overrides: Partial<Job> = {}): Job => ({
   ...overrides,
 })
 
-export type { Context, Job }
+const toStepFixture = (overrides: Partial<Step> = {}): Step => ({
+  conclusion: toConclusion(),
+  status: toStatus(),
+  name: toName(),
+  started_at: '2021-02-11T06:36:05.147Z',
+  completed_at: '2021-02-11T06:46:05.147Z',
+  number: faker.random.number(999),
+  ...overrides,
+})
+
+export type { Context, Job, Step }

@@ -16,12 +16,8 @@ const getMetricsParams = (
 describe('toMetricsReporter', () => {
   const logger = jest.fn()
   let subject: ReturnType<typeof toMetricsReporter>
-  let context: Context
-  let job: Job
 
   beforeEach(() => {
-    context = toContextFixture()
-    job = toJobFixture()
     ;(metrics.gauge as jest.Mock).mockReset()
     ;(metrics.histogram as jest.Mock).mockReset()
     ;(logger as jest.Mock).mockReset()
@@ -29,20 +25,56 @@ describe('toMetricsReporter', () => {
   })
 
   describe('for jobs', () => {
-    beforeEach(() => subject(context, job))
+    const context = toContextFixture()
+    const job = toJobFixture()
 
-    it('reports gauge metrics with the conclusion', () => {
+    beforeEach(() => {
+      subject(context, job)
+    })
+
+    it('reports gauge metrics without the conclusion', () => {
       const [metricsKey] = getMetricsParams(metrics.gauge, 0)
       expect(metricsKey).not.toContain(job.conclusion)
     })
 
-    it('reports gauge metrics without the conclusion', () => {
+    it('reports gauge metrics with the conclusion', () => {
       const [metricsKey] = getMetricsParams(metrics.gauge, 1)
       expect(metricsKey).toContain(job.conclusion)
     })
 
     it('does not report histograms', () => {
       expect(metrics.histogram).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('for steps', () => {
+    const context = toContextFixture()
+    const job = toJobFixture()
+
+    job.steps.forEach((step, idx) => {
+      describe(`step ${idx}`, () => {
+        beforeEach(() => subject(context, job, step))
+
+        it('reports gauge metrics without the conclusion', () => {
+          const [metricsKey] = getMetricsParams(metrics.gauge, 0)
+          expect(metricsKey).not.toContain(step.conclusion)
+        })
+
+        it('reports gauge metrics with the conclusion', () => {
+          const [metricsKey] = getMetricsParams(metrics.gauge, 1)
+          expect(metricsKey).toContain(step.conclusion)
+        })
+
+        it('reports histograms without the conclusion', () => {
+          const [metricsKey] = getMetricsParams(metrics.histogram, 0)
+          expect(metricsKey).not.toContain(step.conclusion)
+        })
+
+        it('reports histograms with the conclusion', () => {
+          const [metricsKey] = getMetricsParams(metrics.histogram, 1)
+          expect(metricsKey).toContain(step.conclusion)
+        })
+      })
     })
   })
 })
