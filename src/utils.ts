@@ -38,8 +38,15 @@ const toDuration = (subject: Subject) => {
   return (completedAt - startedAt) / 1000
 }
 
-const toTags = ({ eventName }: Context, { conclusion }: Subject) =>
-  [`event_name:${eventName}`, `conclusion:${conclusion}`] as const
+const toTags = ({ eventName }: Context, { conclusion }: Subject) => [
+  `event_name:${eventName}`,
+  `conclusion:${conclusion}`,
+]
+
+const withStepName = (tags: string[], name: string) => [
+  ...tags,
+  `step_name:${name}`,
+]
 
 const toMetricsHandler = (log: (item: string) => void, report: Reporter) => (
   metricType: 'gauge' | 'histogram',
@@ -52,7 +59,7 @@ const toMetricsHandler = (log: (item: string) => void, report: Reporter) => (
     conclusion: string
     duration: number
     namespace: (string | undefined)[]
-    tags: string[] | readonly string[]
+    tags: string[]
   },
 ) => {
   const baseKey = toMetricKey(namespace)
@@ -61,8 +68,8 @@ const toMetricsHandler = (log: (item: string) => void, report: Reporter) => (
   log(`(${metricType}) ${baseKey}: ${duration} [${tags}]`)
   log(`(${metricType}) ${keyWithConclusion}: ${duration} [${tags}]`)
 
-  report[metricType](baseKey, duration, tags as string[])
-  report[metricType](keyWithConclusion, duration, tags as string[])
+  report[metricType](baseKey, duration, tags)
+  report[metricType](keyWithConclusion, duration, tags)
 }
 
 export const toMetricsReporter = (
@@ -88,7 +95,7 @@ export const toMetricsReporter = (
         conclusion: subject.conclusion,
         namespace: [context.repo.repo, context.workflow, job.name, 'steps'],
         duration,
-        tags,
+        tags: withStepName(tags, step.name),
       })
     }
   }
