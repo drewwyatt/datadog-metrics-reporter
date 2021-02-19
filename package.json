@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "@types/datadog-metrics": "^0.6.0",
-    "@types/faker": "^5.1.6",
+    "@types/faker": "^5.1.7",
     "@types/jest": "^26.0.15",
     "@types/node": "^14.14.30",
     "@typescript-eslint/parser": "^4.8.1",
