@@ -1,6 +1,6 @@
 # Datadog Metrics Reporter Action
 
-![Build Status](https://github.com/drewwyatt/datadog-metrics-reporter/workflows/build-test/badge.svg) ![Package Version](https://img.shields.io/github/package-json/v/drewwyatt/datadog-metrics-reporter)
+[![CI](https://github.com/drewwyatt/datadog-metrics-reporter/actions/workflows/ci.yml/badge.svg)](https://github.com/drewwyatt/datadog-metrics-reporter/actions/workflows/ci.yml) ![Package Version](https://img.shields.io/github/package-json/v/drewwyatt/datadog-metrics-reporter)
 
 Report CI Metrics to Datadog.
 
