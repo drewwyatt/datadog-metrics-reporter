@@ -118,7 +118,14 @@ const toDuration = (subject) => {
     const startedAt = new Date(subject.started_at);
     return (completedAt - startedAt) / 1000;
 };
-const toTags = ({ eventName }, { conclusion }) => [`event_name:${eventName}`, `conclusion:${conclusion}`];
+const toTags = ({ eventName }, { conclusion }) => [
+    `event_name:${eventName}`,
+    `conclusion:${conclusion}`,
+];
+const withStepName = (tags, name) => [
+    ...tags,
+    `step_name:${name}`,
+];
 const toMetricsHandler = (log, report) => (metricType, { conclusion, duration, namespace, tags, }) => {
     const baseKey = toMetricKey(namespace);
     const keyWithConclusion = toMetricKey([baseKey, conclusion]);
@@ -144,7 +151,7 @@ const toMetricsReporter = (logger, reporter) => (context, job, step) => {
                 conclusion: subject.conclusion,
                 namespace: [context.repo.repo, context.workflow, job.name, 'steps'],
                 duration,
-                tags,
+                tags: withStepName(tags, step.name),
             });
         }
     }
