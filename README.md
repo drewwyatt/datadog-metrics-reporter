@@ -1,3 +1,7 @@
+# ⚠️ You probably don't need this! [DataDog has a first-party integration now](https://www.datadoghq.com/blog/datadog-github-actions-ci-visibility/). ⚠️
+
+When I made this, there wasn't an easy way to report these metrics automatically. Now there is. I'm archiving this since I am not using it anymore (because the first-party integration is easier and nicer). I recommend using that if you can.
+
 # Datadog Metrics Reporter Action
 
 [![CI](https://github.com/drewwyatt/datadog-metrics-reporter/actions/workflows/ci.yml/badge.svg)](https://github.com/drewwyatt/datadog-metrics-reporter/actions/workflows/ci.yml) ![Package Version](https://img.shields.io/github/package-json/v/drewwyatt/datadog-metrics-reporter)
