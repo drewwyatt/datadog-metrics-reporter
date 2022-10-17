@@ -27,7 +27,7 @@
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
-    "datadog-metrics": "^0.8.2"
+    "datadog-metrics": "^0.10.2"
   },
   "devDependencies": {
     "@types/datadog-metrics": "^0.6.0",
